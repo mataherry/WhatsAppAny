@@ -34,7 +34,7 @@
 		<div class="container" style="width: 80%; margin: auto">
 			<div class="hero">
 				<h3>Input Phone Number</h3>
-				<span class="addon">+</span><input id="phoneno" type="number" placeholder="6281xxx">
+				<span class="addon">+</span><input id="phoneno" type="tel" placeholder="6281xxx">
 				<p></p>
 				<a class="btn btn-sm btn-b" onclick="window.location = 'https://api.whatsapp.com/send?phone=' + document.getElementById('phoneno').value.replace(' ','').replace('+','').replace('(','').replace(')','')">Send WhatsApp!</a>
 			</div>

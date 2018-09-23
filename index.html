@@ -21,6 +21,8 @@
 				margin-bottom: 0.3em;
 			}
 		</style>
+		
+		<script src="https://unpkg.com/vue"></script>
 	</head>
 	<body>
 		<nav class="nav" tabindex="-1" onclick="this.focus()">
@@ -31,19 +33,84 @@
 			</div>
 		</nav>
 		<button class="btn-close btn btn-sm">×</button>
-		<div class="container" style="width: 80%; margin: auto">
+		<div id="whatsApp" class="container" style="width: 80%; margin: auto">
 			<p>Send a WhatsApp message to Any number without saving to your Contact list</p>
 			<div class="hero">
 				<h3>Input Phone Number</h3>
-				<span class="addon">+</span><input id="phoneno" type="tel" placeholder="6281xxx">
+				<span class="addon">+</span><input id="phoneno" type="tel" placeholder="6281xxx" v-model="num" class="smooth">
+				<input id="name" placeholder="Name (optional)" v-model="name"><span class="addon" v-on:click="clear">x</span>
 				<p></p>
-				<a class="btn btn-sm btn-b" onclick="window.location = 'https://api.whatsapp.com/send?phone=' + document.getElementById('phoneno').value.replace(' ','').replace('+','').replace('(','').replace(')','')">Send WhatsApp!</a>
+				<button class="btn btn-sm btn-b" v-on:click.stop="send">Send WhatsApp!</button>
 			</div>
 			<p></p>
 			<div class="msg">
 				<strong>Note:</strong>
 				This phone number must have an active account on WhatsApp
 			</div>
+			<p></p>
+			<div class="box" style="max-height:50%; overflow:auto">
+			    History (<a href="#" v-on:click.stop="clearList">Clear</a>)
+			    <ul>
+				<li v-for="(n, i) in listNums">
+				    <a href="#" v-on:click.stop="num = n.num; name = n.name">{{ n.num }}</a> {{n.name}} <a href="#" v-on:click.stop="listNums.splice(i,1);saveList()">x</a>
+				</li>
+			    </ul>
+			</div>
 		</div>
+		
+		<script>
+		    var app = new Vue({
+			el: '#whatsApp',
+			data: {
+			    name: '',
+			    num: '',
+			    listNums: []
+			},
+			mounted() {
+			    if (localStorage.getItem('listNums')) {
+				try {
+				    this.listNums = JSON.parse(localStorage.getItem('listNums'))
+				} catch(e) {
+				    localStorage.removeItem('listNums')
+				}
+			    }
+			},
+			methods: {
+			    send: function() {
+				if (this.num.trim() == '') {
+				    this.num = ''
+				    return
+				}
+				this.addNew()
+				window.location = 'https://api.whatsapp.com/send?phone=' + this.num
+			    },
+			    addNew: function() {
+				// cleansing
+				this.num = this.num.trim().replace(/ /g,'').replace('+','').replace('(','').replace(')','')
+				if (this.num.charAt(0) == '0')
+				    this.num = this.num.replace('0', '62')
+
+				if (this.listNums.findIndex(n => n.num == this.num) >= 0) return
+				this.listNums.unshift({
+				    num: this.num,
+				    name: this.name
+				})
+				this.saveList()
+			    },
+			    clear() {
+				this.num = ''
+				this.name = ''
+			    },
+			    clearList() {
+			      this.listNums = []
+			      this.saveList()
+			    },
+			    saveList() {
+				const parsed = JSON.stringify(this.listNums)
+				localStorage.setItem('listNums', parsed)
+			    }
+			}
+		    })
+		</script>
 	</body>
 </html>

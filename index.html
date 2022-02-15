@@ -59,12 +59,13 @@
 		</div>
 		
 		<script>
-		    var app = new Vue({
-			el: '#whatsApp',
-			data: {
-			    name: '',
-			    num: '',
-			    listNums: []
+		    var app = Vue.create({
+			data() {
+				return {
+					name: '',
+					num: '',
+					listNums: []
+				}
 			},
 			mounted() {
 			    if (localStorage.getItem('listNums')) {
@@ -111,6 +112,7 @@
 			    }
 			}
 		    })
+			app.mount('#whatsApp')
 		</script>
 	</body>
 </html>
